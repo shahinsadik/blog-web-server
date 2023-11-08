@@ -6,7 +6,9 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 // middleware
-app.use(cors());
+app.use(cors({
+  origin: ["https://web-blog-96ed9.web.app", "https://web-blog-96ed9.firebaseapp.com"]
+}));
 app.use(express.json());
 
 
@@ -22,6 +24,21 @@ const client = new MongoClient(uri, {
     deprecationErrors: true,
   }
 });
+const verifyToken = (req, res, next) => {
+  const token = req.cookies.token;
+  console.log(token);
+  if (!token) {
+    return res.status(401).send({ message: "Unauthorized" });
+  }
+  jwt.verify(token, process.env.SECRET, (err, decoded) => {
+    if (err) {
+      return res.status(401).send({ message: "Unauthorized" });
+    }
+    // console.log(decoded);
+    req.user = decoded;
+    next();
+  });
+};
 
 async function run() {
   try {
@@ -31,6 +48,19 @@ async function run() {
     const blogPostCollection = client.db("techBlog").collection("addBlogPost");
     const blogCommentCollection = client.db("techBlog").collection("blogComment");
     const wishListCommentCollection = client.db("techBlog").collection("wishList");
+
+    app.post("/api/v1/token", async (req, res) => {
+      const user = req.body;
+      console.log(user);
+      const token = jwt.sign(user, process.env.SECRET, { expiresIn: "1h" });
+      res
+        .cookie("token", token, {
+          httpOnly: true,
+          secure: true,
+          sameSite: "none",
+        })
+        .send({ success: true });
+    });
 
     app.post("/api/v1/create-post", async (req, res) => {
         const post = req.body;
@@ -50,7 +80,8 @@ async function run() {
         const result = await blogPostCollection.findOne(query);
         res.send(result);
       });
-      // comment section 
+
+      // comment sections 
       app.post("/api/v1/create-comment", async (req, res) => {
         const post = req.body;
         const result = await blogCommentCollection.insertOne(post);
