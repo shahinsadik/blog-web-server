@@ -15,7 +15,8 @@ app.use(express.json());
 
 
 const uri = "mongodb+srv://techBlog:3MjWHr9fpxYQg5Ao@cluster0.lz5tib6.mongodb.net/?retryWrites=true&w=majority";
-s object to set the Stable API version
+
+// Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
@@ -41,7 +42,7 @@ const verifyToken = (req, res, next) => {
 
 async function run() {
   try {
-    // Connect the client to the server	(optional starting in v4.7)
+    // Connect the client to 	(optional starting in v4.7)
     // await client.connect();
 
     const blogPostCollection = client.db("techBlog").collection("addBlogPost");
