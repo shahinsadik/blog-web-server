@@ -7,7 +7,7 @@ const port = process.env.PORT || 5000;
 
 // middleware
 app.use(cors({
-  origin: ["https://web-blog-96ed9.web.app", "https://web-blog-96ed9.firebaseapp.com"]
+  origin: ["https://web-blog-96ed9.web.app", "https://web-blog-96ed9.firebaseapp.com", "http://localhost:5173"]
 }));
 app.use(express.json());
 
@@ -42,7 +42,7 @@ const verifyToken = (req, res, next) => {
 
 async function run() {
   try {
-    // Connect the client to 	(optional starting in v4.7)
+    // Connect the client to the server	(optional starting in v4.7)
     // await client.connect();
 
     const blogPostCollection = client.db("techBlog").collection("addBlogPost");
